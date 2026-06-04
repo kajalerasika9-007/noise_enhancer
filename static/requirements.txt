@@ -1,3 +1,7 @@
-git add requirements.txt
-git commit -m "Add requirements"
-git push origin main
+Flask
+flask-cors
+gunicorn
+pydub
+pyloudnorm
+soundfile
+deepfilternet
