@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EchoAI</title>
+  <link rel="stylesheet" href="style.css" />
+ 
+
+</head>
+
+<body>
+
+  <div class="glow1"></div>
+  <div class="glow2"></div>
+
+  <div class="container">
+
+    <!-- NAVBAR -->
+    <nav>
+
+      <div class="logo">EchoAI</div>
+
+      <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">How It Works</a>
+        <a href="#">GitHub</a>
+      </div>
+
+      <button class="signin-btn">Sign In</button>
+
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="hero-text">
+
+        <h1>
+          Enhance Noisy <br>
+          YouTube Audio <br>
+          Using AI.
+        </h1>
+
+        <p>
+          Remove background noise, improve voice clarity and get crystal clear audio using AI technology.
+        </p>
+
+        <!-- INPUT -->
+        <div class="input-row">
+          <input type="text"
+          id="yt-url"
+          placeholder="Paste YouTube URL here"
+          class="url-input">
+        </div>
+        
+
+        <!-- BUTTONS -->
+        <div class="buttons">
+
+          <button class="primary-btn">
+            ✨ Remove Noise
+          </button>
+
+          <input type="file"
+          id="file-input"
+          hidden
+          accept="video/*">
+
+          <button class="secondary-btn"
+          onclick="document.getElementById('file-input').click()">
+            📤 Upload File
+          </button>
+
+        </div>
+        
+
+        <p id="status" class="status-msg"></p>
+
+        <!-- DOWNLOAD BUTTON -->
+        <a id="download-link"
+        hidden
+        class="download-link-btn">
+          ⬇ Download Clean Video
+        </a>
+
+        <!-- FEATURES -->
+        <div class="feature-pills">
+
+          <div class="pill">
+            <h4>AI Noise Removal</h4>
+            <p>Powered by Deep Learning</p>
+          </div>
+
+          <div class="pill">
+            <h4>High Quality</h4>
+            <p>Crystal Clear Audio</p>
+          </div>
+
+          <div class="pill">
+            <h4>Fast Processing</h4>
+            <p>In Seconds</p>
+          </div>
+
+          <div class="pill">
+            <h4>Secure</h4>
+            <p>Your files are safe</p>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- HERO RIGHT -->
+
+      <div class="hero-image">
+
+        <div class="headphone-circle">
+
+          <!-- Put image in same folder -->
+          <img src="headphone_animation.png" class="headphone" alt="pair of headphones centered in a glowing blue circle over a dark tech background suggesting audio cleaning">
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
+  <script src="script.js"></script>
+
+</body>
+</html>
