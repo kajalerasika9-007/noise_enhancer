@@ -20,26 +20,12 @@ FFMPEG = shutil.which("ffmpeg") or "ffmpeg"
 DL_DIR = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DL_DIR, exist_ok=True)
 
-model = None
-df_state = None
-
-def get_model():
-    global model, df_state
-
-    if model is None:
-        print("Loading DeepFilterNet model...")
-        model, df_state, _ = init_df()
-        print("Model ready!")
-
-    return model, df_state
+print("Loading DeepFilterNet model...")
+model, df_state, _ = init_df()
+print("Model ready!")
 
 print(f"FFMPEG Path: {FFMPEG}")
 print(f"YTDLP Path: {YTDLP}")
-
-print("Current Working Directory:", os.getcwd())
-print("Downloads Folder:", DL_DIR)
-print("Files:", os.listdir(BASE_DIR))
-
 
 def apply_speech_eq(input_wav, output_wav):
     """
@@ -48,19 +34,21 @@ def apply_speech_eq(input_wav, output_wav):
     + Speech clarity boost
     - Reduce harsh highs
     """
-@app.route('/process', methods=['POST'])
-DEF PROCESS():
-           
-    try:
-        subprocess.run([...], check=True)
-    except subprocess.CalledProcessError as e:
-    return jsonify({"error": str(e) }), 500
-   
-        
-    
+    subprocess.run([
+        FFMPEG,
+        '-y',
+        '-i', input_wav,
+        '-af',
+        (
+            'equalizer=f=200:t=h:w=200:g=2,'
+            'equalizer=f=2500:t=h:w=1500:g=2,'
+            'equalizer=f=7000:t=h:w=2000:g=-2'
+        ),
+        output_wav
+    ], check=True)
 @app.route('/')
 def index():
-    return "Backend Running Successfully"
+    return app.send_static_file('index.html')
 
 # =================== YOUTUBE URL ===================
 @app.route('/process', methods=['POST'])
@@ -99,12 +87,10 @@ def process():
 
     # Step 3: DeepFilterNet se clean karo
     print("Cleaning audio...")
-    model, df_state = get_model()
-
     audio_tensor, _ = load_audio(audio_path, sr=df_state.sr())
     enhanced = enhance(model, df_state, audio_tensor)
     save_audio(clean_audio, enhanced, df_state.sr())
-    
+
     # Step 4: Auto normalize
     print("Normalizing volume...")
     data, rate = sf.read(clean_audio)
@@ -172,8 +158,6 @@ def process_file():
 
     # Step 3: DeepFilterNet se clean karo
     print("Cleaning uploaded file...")
-    model, df_state = get_model()
-
     audio_tensor, _ = load_audio(audio_path, sr=df_state.sr())
     enhanced = enhance(model, df_state, audio_tensor)
     save_audio(clean_audio, enhanced, df_state.sr())
@@ -229,15 +213,8 @@ def process_file():
                         download_name='clean_audio.wav')
 
 
-@app.route('/health')
-def health():
-    return jsonify({
-        "status": "running"
-    })
-
-
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=5000)
+    
 
-
+ye kuch changes kiye h backend me jisse ki render chale and deploy ho ek baar dekhlo isse
