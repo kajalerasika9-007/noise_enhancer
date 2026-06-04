@@ -1,2 +1,0 @@
-[phases.setup]
-nixPkgs = ["python311", "rustc", "cargo", "ffmpeg"]
