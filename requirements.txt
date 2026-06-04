@@ -1,7 +1,11 @@
 Flask
-flask-cors
+Flask-Cors
 gunicorn
+yt-dlp
 pydub
-pyloudnorm
 soundfile
+pyloudnorm
 deepfilternet
+numpy
+scipy
+torch
