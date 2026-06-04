@@ -217,4 +217,4 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
     
 
-ye kuch changes kiye h backend me jisse ki render chale and deploy ho ek baar dekhlo isse
+# ye kuch changes kiye h backend me jisse ki render chale and deploy ho ek baar dekhlo isse
