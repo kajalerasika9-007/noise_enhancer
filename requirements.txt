@@ -5,7 +5,7 @@ yt-dlp
 pydub
 soundfile
 pyloudnorm
-deepfilternet
 numpy
 scipy
 torch
+deepfilternet
