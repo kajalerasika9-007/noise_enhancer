@@ -1,7 +1,0 @@
-Flask
-flask-cors
-gunicorn
-pydub
-pyloudnorm
-soundfile
-deepfilternet
