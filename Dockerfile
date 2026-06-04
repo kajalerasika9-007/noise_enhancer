@@ -1,5 +1,9 @@
 FROM python:3.11-slim
 
+# Prevent Python buffering
+ENV PYTHONUNBUFFERED=1
+ENV PORT=10000
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     ffmpeg \
@@ -11,15 +15,20 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy requirements first (better caching)
+# Copy requirements first
 COPY requirements.txt .
 
+# Upgrade pip
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+
+# Install requirements
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY . .
 
+# Render uses port 10000
 EXPOSE 10000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]
+# Start Flask app
+CMD gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 300 app:app
