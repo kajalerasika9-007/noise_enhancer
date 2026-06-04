@@ -137,7 +137,10 @@ def process_file():
     if not file:
         return jsonify({'error': 'No file provided'}), 400
 
-    original_path = os.path.join(DL_DIR, 'uploaded_file')
+    original_path = os.path.join(
+        DL_DIR,
+        f"uploaded{os.path.splitext(file.filename)[1]}"
+    )
     audio_path    = os.path.join(DL_DIR, 'audio.wav')
     clean_audio   = os.path.join(DL_DIR, 'clean_audio.wav')
     output_path   = os.path.join(DL_DIR, 'output.mp4')
@@ -195,7 +198,7 @@ def process_file():
             '-c:v', 'copy',
             '-map', '0:v:0',
             '-map', '1:a:0',
-            ouput_path
+            output_path
         ], check=True)
         return send_file(
             output_path,
