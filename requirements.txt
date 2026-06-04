@@ -7,5 +7,5 @@ soundfile
 pyloudnorm
 numpy
 scipy
-torch
+torch==2.3.1
 deepfilternet
