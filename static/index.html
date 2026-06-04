@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EchoAI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="glow1"></div>
+  <div class="glow2"></div>
+
+  <div class="container">
+
+    <!-- NAVBAR -->
+    <nav>
+      <div class="logo">EchoAI</div>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="https://github.com/Ankita-19624792/audio-noise-remover.git">GitHub</a>
+      </div>
+      <button class="signin-btn">Sign In</button>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+
+      <div class="hero-text">
+
+        <h1>
+          Enhance Noisy <br>
+          YouTube Audio <br>
+          Using AI.
+        </h1>
+
+        <p>
+          Remove background noise, improve voice clarity and get crystal clear audio using AI technology.
+        </p>
+
+        <!-- INPUT + BUTTONS -->
+        <div class="input-row">
+          <input type="text" id="yt-url" placeholder="Paste YouTube URL here" class="url-input">
+        </div>
+
+        <div class="buttons">
+          <button class="primary-btn" onclick="processVideo()">
+            ✨ Remove Noise
+          </button>
+          <button class="secondary-btn">
+            Upload File
+          </button>
+        </div>
+
+        <!-- STATUS MESSAGE -->
+        <p id="status" class="status-msg"></p>
+
+        <!-- DOWNLOAD BUTTON -->
+        <a id="download-link" hidden class="download-link-btn">
+          <span>⬇</span> Download Clean Video
+        </a>
+
+        <!-- FEATURE PILLS -->
+        <div class="feature-pills">
+          <div class="pill">
+            <h4>AI Noise Removal</h4>
+            <p>Powered by Deep Learning</p>
+          </div>
+          <div class="pill">
+            <h4>High Quality</h4>
+            <p>Crystal Clear Audio</p>
+          </div>
+          <div class="pill">
+            <h4>Fast Processing</h4>
+            <p>In Seconds</p>
+          </div>
+          <div class="pill">
+            <h4>Secure</h4>
+            <p>Your files are safe</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- HERO RIGHT -->
+      <div class="hero-image">
+        <div class="headphone-circle">
+          <div class="headphone">🎧</div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
