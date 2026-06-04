@@ -44,14 +44,28 @@
           <input type="text" id="yt-url" placeholder="Paste YouTube URL here" class="url-input">
         </div>
 
+        <input type="file" id="fileInput" hidden />
+
         <div class="buttons">
           <button class="primary-btn" onclick="processVideo()">
             ✨ Remove Noise
           </button>
-          <button class="secondary-btn">
+        
+          <button class="secondary-btn" onclick="openFileExplorer()">
             Upload File
           </button>
         </div>
+        
+        <script>
+        function openFileExplorer() {
+          document.getElementById("fileInput").click();
+        }
+        
+        document.getElementById("fileInput").addEventListener("change", function(event) {
+          const file = event.target.files[0];
+          console.log("Uploaded file:", file);
+        });
+        </script>
 
         <!-- STATUS MESSAGE -->
         <p id="status" class="status-msg"></p>
