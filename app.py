@@ -48,13 +48,15 @@ def apply_speech_eq(input_wav, output_wav):
     + Speech clarity boost
     - Reduce harsh highs
     """
-    
-try:
-    subprocess.run([...], check=True)
-except subprocess.CalledProcessError as e:
-    return jsonify({
-        "error": str(e)
-    }), 500
+@app.route('/process', methods=['POST'])
+DEF PROCESS():
+           
+    try:
+        subprocess.run([...], check=True)
+    except subprocess.CalledProcessError as e:
+    return jsonify({"error": str(e) }), 500
+   
+        
     
 @app.route('/')
 def index():
