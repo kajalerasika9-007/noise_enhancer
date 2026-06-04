@@ -3,6 +3,7 @@ from flask_cors import CORS
 import subprocess
 import pydub
 import os
+import shutil
 import pyloudnorm as pyln
 import soundfile as sf
 from df.enhance import enhance, init_df, load_audio, save_audio
@@ -11,13 +12,20 @@ app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-YTDLP    = os.path.join(BASE_DIR, 'yt-dlp.exe')
-FFMPEG   = os.path.join(BASE_DIR, 'ffmpeg.exe')
-DL_DIR   = os.path.join(BASE_DIR, 'downloads')
+
+# Cross-platform executable detection
+YTDLP = shutil.which("yt-dlp") or "yt-dlp"
+FFMPEG = shutil.which("ffmpeg") or "ffmpeg"
+
+DL_DIR = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DL_DIR, exist_ok=True)
+
 print("Loading DeepFilterNet model...")
 model, df_state, _ = init_df()
 print("Model ready!")
+
+print(f"FFMPEG Path: {FFMPEG}")
+print(f"YTDLP Path: {YTDLP}")
 
 def apply_speech_eq(input_wav, output_wav):
     """
@@ -64,7 +72,6 @@ def process():
         YTDLP,
         '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
         '--merge-output-format', 'mp4',
-        '--ffmpeg-location', BASE_DIR,
         '-o', video_path,
         url
     ], check=True)
@@ -181,21 +188,28 @@ def process_file():
     is_video = file.filename.lower().endswith(('.mp4', '.mov', '.avi'))
     if is_video:
         subprocess.run([
-            FFMPEG, '-y',
-            '-i', video_path,
-            '-vn',
-            '-ac', '1',
-            '-ar', '16000',
-            '-c:a', 'pcm_s16le',
-            audio_path
+            FFMPEG,
+            '-y',
+            '-i', original_path,
+            '-i', clean_audio,
+            '-c:v', 'copy',
+            '-map', '0:v:0',
+            '-map', '1:a:0',
+            ouput_path
         ], check=True)
-        return send_file(output_path, as_attachment=True,
-                        download_name='clean_video.mp4')
+        return send_file(
+            output_path,
+            as_attachment=True,
+            download_name = 'clean_video.mp4'
+        )
+        
+        
+
     else:
         return send_file(clean_audio, as_attachment=True,
                         download_name='clean_audio.wav')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
     
