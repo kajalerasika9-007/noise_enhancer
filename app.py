@@ -20,9 +20,16 @@ FFMPEG = shutil.which("ffmpeg") or "ffmpeg"
 DL_DIR = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DL_DIR, exist_ok=True)
 
-print("Loading DeepFilterNet model...")
-model, df_state, _ = init_df()
-print("Model ready!")
+import traceback
+
+try:
+    print("Loading DeepFilterNet model...")
+    model, df_state, _ = init_df()
+    print("DeepFilterNet loaded successfully")
+except Exception as e:
+    print(f"MODEL LOAD ERROR: {e}")
+    traceback.print_exc()
+    raise
 
 print(f"FFMPEG Path: {FFMPEG}")
 print(f"YTDLP Path: {YTDLP}")
@@ -213,8 +220,9 @@ def process_file():
                         download_name='clean_audio.wav')
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
-    
+
+    if __name__ == '__main__':
+        port = int(os.environ.get("PORT", 10000))
+        app.run(host='0.0.0.0', port=port)
 
 # ye kuch changes kiye h backend me jisse ki render chale and deploy ho ek baar dekhlo isse
