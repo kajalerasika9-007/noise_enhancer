@@ -57,6 +57,10 @@ def apply_speech_eq(input_wav, output_wav):
 def index():
     return app.send_static_file('index.html')
 
+@app.route('/health')
+def health():
+    return jsonify({"status": "ok"})
+
 # =================== YOUTUBE URL ===================
 @app.route('/process', methods=['POST'])
 def process():
