@@ -26,9 +26,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
 COPY . .
+# Create downloads directory
+RUN mkdir -p downloads
 
 # Render uses port 10000
 EXPOSE 10000
 
 # Start Flask app
-CMD gunicorn --bind 0.0.0.0:$PORT --workers 1 --timeout 300 app:app
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "--workers", "1", "--timeout", "600", "app:app"]
