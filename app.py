@@ -73,7 +73,7 @@ def process():
     subprocess.run([
         FFMPEG,
         '-y',
-        '-i', video_path,
+        '-i', original_path,
         '-vn',
         '-ac', '1',
         '-ar', '48000',
