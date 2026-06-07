@@ -20,12 +20,6 @@ model, df_state, _ = init_df()
 print("Model ready!")
 
 def apply_speech_eq(input_wav, output_wav):
-    """
-    Lecture-focused EQ:
-    + Slight warmth
-    + Speech clarity boost
-    - Reduce harsh highs
-    """
     subprocess.run([
         FFMPEG,
         '-y',
@@ -38,6 +32,7 @@ def apply_speech_eq(input_wav, output_wav):
         ),
         output_wav
     ], check=True)
+
 @app.route('/')
 def index():
     return app.send_static_file('index.html')
@@ -69,46 +64,36 @@ def process():
         url
     ], check=True)
 
-    # Step 2: Extract audio
+    # Step 2: Extract audio  ✅ fixed: video_path not original_path
     subprocess.run([
         FFMPEG,
         '-y',
-        '-i', original_path,
+        '-i', video_path,
         '-vn',
         '-ac', '1',
         '-ar', '48000',
         audio_path
     ], check=True)
 
-    # Step 3: DeepFilterNet se clean karo
+    # Step 3: Clean audio
     print("Cleaning audio...")
     audio_tensor, _ = load_audio(audio_path, sr=df_state.sr())
     enhanced = enhance(model, df_state, audio_tensor)
     save_audio(clean_audio, enhanced, df_state.sr())
 
-    # Step 4: Auto normalize
+    # Step 4: Normalize
     print("Normalizing volume...")
-    data, rate = sf.read(clean_audio)
-
+    audio_data, rate = sf.read(clean_audio)
     meter = pyln.Meter(rate)
-    loudness = meter.integrated_loudness(data)
-
-    normalized = pyln.normalize.loudness(
-        data,
-        loudness,
-        -16.0
-    )
-
+    loudness = meter.integrated_loudness(audio_data)
+    normalized = pyln.normalize.loudness(audio_data, loudness, -16.0)
     sf.write(clean_audio, normalized, rate)
 
     eq_audio = os.path.join(DL_DIR, 'eq_audio.wav')
-
     print("Applying speech EQ...")
     apply_speech_eq(clean_audio, eq_audio)
-
     os.remove(clean_audio)
     os.rename(eq_audio, clean_audio)
-
     print("Done!")
 
     # Step 5: Merge back
@@ -141,60 +126,45 @@ def process_file():
         if os.path.exists(f):
             os.remove(f)
 
-    # file save karo
     file.save(original_path)
 
-    # WAV mein convert karo
-    # WAV mein convert karo
     audio = pydub.AudioSegment.from_file(original_path)
-
-    # DeepFilterNet ke liye optimize
-    audio = audio.set_channels(1)      # Mono
-    audio = audio.set_frame_rate(48000) # 48 kHz
-
+    audio = audio.set_channels(1)
+    audio = audio.set_frame_rate(48000)
     audio.export(audio_path, format='wav')
-    # Step 3: DeepFilterNet se clean karo
+
+    # Step 3: Clean audio
     print("Cleaning uploaded file...")
     audio_tensor, _ = load_audio(audio_path, sr=df_state.sr())
     enhanced = enhance(model, df_state, audio_tensor)
     save_audio(clean_audio, enhanced, df_state.sr())
 
-    # Step 4: Auto normalize
+    # Step 4: Normalize
     print("Normalizing volume...")
-    data, rate = sf.read(clean_audio)
-
+    audio_data, rate = sf.read(clean_audio)
     meter = pyln.Meter(rate)
-    loudness = meter.integrated_loudness(data)
-
-    normalized = pyln.normalize.loudness(
-        data,
-        loudness,
-        -16.0
-    )
-
+    loudness = meter.integrated_loudness(audio_data)
+    normalized = pyln.normalize.loudness(audio_data, loudness, -16.0)
     sf.write(clean_audio, normalized, rate)
 
     eq_audio = os.path.join(DL_DIR, 'eq_audio.wav')
-
     print("Applying speech EQ...")
     apply_speech_eq(clean_audio, eq_audio)
-
     os.remove(clean_audio)
     os.rename(eq_audio, clean_audio)
-
     print("Done!")
 
-    # video hai to merge karo
+    # Step 5: Return file  ✅ fixed: original_path instead of video_path
     is_video = file.filename.lower().endswith(('.mp4', '.mov', '.avi'))
     if is_video:
         subprocess.run([
             FFMPEG, '-y',
-            '-i', video_path,
-            '-vn',
-            '-ac', '1',
-            '-ar', '16000',
-            '-c:a', 'pcm_s16le',
-            audio_path
+            '-i', original_path,
+            '-i', clean_audio,
+            '-c:v', 'copy',
+            '-map', '0:v:0',
+            '-map', '1:a:0',
+            output_path
         ], check=True)
         return send_file(output_path, as_attachment=True,
                         download_name='clean_video.mp4')
