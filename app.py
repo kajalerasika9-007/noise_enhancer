@@ -3,7 +3,6 @@ from flask_cors import CORS
 import subprocess
 import pydub
 import os
-import shutil
 import pyloudnorm as pyln
 import soundfile as sf
 from df.enhance import enhance, init_df, load_audio, save_audio
@@ -12,27 +11,13 @@ app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Cross-platform executable detection
-YTDLP = shutil.which("yt-dlp") or "yt-dlp"
-FFMPEG = shutil.which("ffmpeg") or "ffmpeg"
-
-DL_DIR = os.path.join(BASE_DIR, "downloads")
+YTDLP    = os.path.join(BASE_DIR, 'yt-dlp.exe')
+FFMPEG   = os.path.join(BASE_DIR, 'ffmpeg.exe')
+DL_DIR   = os.path.join(BASE_DIR, 'downloads')
 os.makedirs(DL_DIR, exist_ok=True)
-
-import traceback
-
-try:
-    print("Loading DeepFilterNet model...")
-    model, df_state, _ = init_df()
-    print("DeepFilterNet loaded successfully")
-except Exception as e:
-    print(f"MODEL LOAD ERROR: {e}")
-    traceback.print_exc()
-    raise
-
-print(f"FFMPEG Path: {FFMPEG}")
-print(f"YTDLP Path: {YTDLP}")
+print("Loading DeepFilterNet model...")
+model, df_state, _ = init_df()
+print("Model ready!")
 
 def apply_speech_eq(input_wav, output_wav):
     """
@@ -57,10 +42,6 @@ def apply_speech_eq(input_wav, output_wav):
 def index():
     return app.send_static_file('index.html')
 
-@app.route('/health')
-def health():
-    return jsonify({"status": "ok"})
-
 # =================== YOUTUBE URL ===================
 @app.route('/process', methods=['POST'])
 def process():
@@ -83,16 +64,19 @@ def process():
         YTDLP,
         '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
         '--merge-output-format', 'mp4',
+        '--ffmpeg-location', BASE_DIR,
         '-o', video_path,
         url
     ], check=True)
 
     # Step 2: Extract audio
     subprocess.run([
-        FFMPEG, '-y',
+        FFMPEG,
+        '-y',
         '-i', video_path,
-        '-q:a', '0',
-        '-map', 'a',
+        '-vn',
+        '-ac', '1',
+        '-ar', '48000',
         audio_path
     ], check=True)
 
@@ -148,10 +132,7 @@ def process_file():
     if not file:
         return jsonify({'error': 'No file provided'}), 400
 
-    original_path = os.path.join(
-        DL_DIR,
-        f"uploaded{os.path.splitext(file.filename)[1]}"
-    )
+    original_path = os.path.join(DL_DIR, 'uploaded_file')
     audio_path    = os.path.join(DL_DIR, 'audio.wav')
     clean_audio   = os.path.join(DL_DIR, 'clean_audio.wav')
     output_path   = os.path.join(DL_DIR, 'output.mp4')
@@ -164,9 +145,14 @@ def process_file():
     file.save(original_path)
 
     # WAV mein convert karo
+    # WAV mein convert karo
     audio = pydub.AudioSegment.from_file(original_path)
-    audio.export(audio_path, format='wav')
 
+    # DeepFilterNet ke liye optimize
+    audio = audio.set_channels(1)      # Mono
+    audio = audio.set_frame_rate(48000) # 48 kHz
+
+    audio.export(audio_path, format='wav')
     # Step 3: DeepFilterNet se clean karo
     print("Cleaning uploaded file...")
     audio_tensor, _ = load_audio(audio_path, sr=df_state.sr())
@@ -202,31 +188,21 @@ def process_file():
     is_video = file.filename.lower().endswith(('.mp4', '.mov', '.avi'))
     if is_video:
         subprocess.run([
-            FFMPEG,
-            '-y',
-            '-i', original_path,
-            '-i', clean_audio,
-            '-c:v', 'copy',
-            '-map', '0:v:0',
-            '-map', '1:a:0',
-            output_path
+            FFMPEG, '-y',
+            '-i', video_path,
+            '-vn',
+            '-ac', '1',
+            '-ar', '16000',
+            '-c:a', 'pcm_s16le',
+            audio_path
         ], check=True)
-        return send_file(
-            output_path,
-            as_attachment=True,
-            download_name = 'clean_video.mp4'
-        )
-        
-        
-
+        return send_file(output_path, as_attachment=True,
+                        download_name='clean_video.mp4')
     else:
         return send_file(clean_audio, as_attachment=True,
                         download_name='clean_audio.wav')
 
 
-
-    if __name__ == '__main__':
-        port = int(os.environ.get("PORT", 10000))
-        app.run(host='0.0.0.0', port=port)
-
-# ye kuch changes kiye h backend me jisse ki render chale and deploy ho ek baar dekhlo isse
+if __name__ == '__main__':
+    app.run(debug=True)
+    
