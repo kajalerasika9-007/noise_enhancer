@@ -11,8 +11,9 @@ RUN apt-get update && apt-get install -y \
     curl \
     rustc \
     cargo \
+    git \
     && rm -rf /var/lib/apt/lists/*
-
+    
 WORKDIR /app
 
 # Copy requirements first
