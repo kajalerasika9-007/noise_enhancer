@@ -54,7 +54,6 @@ document.getElementById("fileInput").addEventListener("change", async function(e
       method: 'POST',
       body: formData
     });
-
     if (!res.ok) {
       const errorText = await res.text();
       console.error(errorText);
@@ -65,9 +64,22 @@ document.getElementById("fileInput").addEventListener("change", async function(e
     const blob = await res.blob();
     const downloadUrl = window.URL.createObjectURL(blob);
     link.href = downloadUrl;
-    link.download = 'clean_audio.wav';
+
+    // check file type and set correct download format
+    const fileName = file.name.toLowerCase();
+    const isVideo = fileName.endsWith('.mp4') || 
+                    fileName.endsWith('.mov') || 
+                    fileName.endsWith('.avi');
+
+    if (isVideo) {
+      link.download = 'clean_video.mp4';  // mp4 opens on every device
+      status.textContent = '✅ Done! Your clean video is ready.';
+    } else {
+      link.download = 'clean_audio.mp3';  // mp3 opens on every device
+      status.textContent = '✅ Done! Your clean audio is ready.';
+    }
+
     link.hidden = false;
-    status.textContent = '✅ Done! Your clean file is ready.';
 
   } catch (e) {
     console.error(e);
