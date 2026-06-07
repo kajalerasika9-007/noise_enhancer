@@ -26,10 +26,14 @@ def apply_speech_eq(input_wav, output_wav):
         '-i', input_wav,
         '-af',
         (
-            'equalizer=f=200:t=h:w=200:g=2,'
-            'equalizer=f=2500:t=h:w=1500:g=2,'
-            'equalizer=f=7000:t=h:w=2000:g=-2'
+            'equalizer=f=200:t=h:w=200:g=1,'
+            'equalizer=f=2500:t=h:w=1500:g=1,'
+            'equalizer=f=7000:t=h:w=2000:g=-1,'
+            'loudnorm'
         ),
+        '-ar', '44100',
+        '-ac', '1',
+        '-c:a', 'pcm_s16le',
         output_wav
     ], check=True)
 
@@ -64,7 +68,7 @@ def process():
         url
     ], check=True)
 
-    # Step 2: Extract audio  ✅ fixed: video_path not original_path
+    # Step 2: Extract audio
     subprocess.run([
         FFMPEG,
         '-y',
@@ -154,7 +158,7 @@ def process_file():
     os.rename(eq_audio, clean_audio)
     print("Done!")
 
-    # Step 5: Return file  ✅ fixed: original_path instead of video_path
+    # Step 5: Return file
     is_video = file.filename.lower().endswith(('.mp4', '.mov', '.avi'))
     if is_video:
         subprocess.run([
@@ -175,4 +179,3 @@ def process_file():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
