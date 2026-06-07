@@ -11,8 +11,8 @@ app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-YTDLP    = os.path.join(BASE_DIR, 'yt-dlp.exe')
-FFMPEG   = os.path.join(BASE_DIR, 'ffmpeg.exe')
+YTDLP    = "yt-dlp"
+FFMPEG   = "ffmpeg"
 DL_DIR   = os.path.join(BASE_DIR, 'downloads')
 os.makedirs(DL_DIR, exist_ok=True)
 print("Loading DeepFilterNet model...")
